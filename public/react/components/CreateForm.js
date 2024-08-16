@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import apiURL from '../api'
 
-const Form = () => {
+const CreateForm = ({ hideForm, fetchPages }) => {
   const [data, setData] = useState({
     title: '',
     content: '',
@@ -17,8 +17,39 @@ const Form = () => {
     })
   }
 
+  const handleSubmit = async (event) => {
+    // Prevent the form from submitting to the server
+    event.preventDefault();
+
+    // Make a POST request to /api/wiki
+    await fetch(event.target.action, {
+      method: "POST",
+      // tells the server to treat as a json
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data) //taking an object and turning into string 
+    });
+
+    // Fetch the updated list of articles
+    await fetchPages();
+
+    // Clear the form 
+    // setData({
+    //   title: '',
+    //   content: '',
+    //   name: '',
+    //   email: '',
+    //   tags: ''
+    // })
+
+    // Hide the form
+    hideForm();
+
+  }
+
   return (
-    <form action={`${apiURL}/wiki`} method="POST">
+    <form action={`${apiURL}/wiki`} method="POST" onSubmit={handleSubmit}>
       <p>
         <label htmlFor="title">Title</label>
         <input
@@ -80,4 +111,4 @@ const Form = () => {
   )
 }
 
-export default Form
+export default CreateForm

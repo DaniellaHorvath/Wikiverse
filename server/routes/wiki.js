@@ -85,11 +85,28 @@ router.put('/:slug', async (req, res, next) => {
       return tag
     }))
 
-    const page = await Page.findOne(
+    let page = await Page.findOne(
       {where: {slug: req.params.slug}}
+
     );
     await page.setTags(tags);
     await page.setAuthor(user);
+
+    page = await Page.findOne({
+      where: {
+        slug: req.params.slug
+      },
+      include: [
+        {
+          model: Tag,
+          through: { attributes: [] } // exclude join table data
+        },
+        {
+          model: User,
+          as: 'author'
+        }
+      ]
+    })
 
     res.send(page);
   } catch (error) {

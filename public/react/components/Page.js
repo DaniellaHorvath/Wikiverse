@@ -1,12 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
+import apiURL from "../api";
+import EditForm from "./EditForm";
 
 const Page = (props) => {
+  // const[isAddingPage, setIsAddingPage ] = useState(false);
+  const[isEditingPage, setEditingPage ] = useState(false);
+
   const handleClick = (event) => {
     // Prevents the browser from following the link.
     event.preventDefault()
 
     // Updates the currentPage state (in App) with null.
     props.navigate(null)
+  }
+
+  const handleDelete = async () => {
+    // Confirm the deletion before doing it 
+    const isConfirmed = window.confirm(`Are you sure you want to delete this page?`);
+    if(!isConfirmed) return;
+    // Send a delete request to /api/wiki/:slug
+    await fetch(apiURL + "/wiki/" + props.slug, {
+      method: "DELETE"
+    })
+    // Get 
+    await props.fetchPages();
+
+    // Return 
+    props.navigate(null);
   }
 
   return (
@@ -22,6 +42,10 @@ const Page = (props) => {
           <li key={tag.id}>{tag.name}</li>
         ))}
       </ul>
+      <button onClick={() => setEditingPage(!isEditingPage)} aria-expanded={isEditingPage}>Edit Page</button>
+      {" "}
+      <button onClick={handleDelete}>Delete page</button>
+      {isEditingPage && <EditForm {...props} />}
     </main>
   )
 }
